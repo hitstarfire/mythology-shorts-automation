@@ -1,0 +1,23 @@
+name: Build Mythology Short
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare output folders
+        run: |
+          mkdir -p output
+          echo "Mythology Shorts workflow is ready." > output/status.txt
+
+      - name: Save build status
+        uses: actions/upload-artifact@v4
+        with:
+          name: mythology-short-build
+          path: output/
+          

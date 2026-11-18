@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 import edge_tts
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
 VOICE = "hi-IN-MadhurNeural"  # Hindi male neural voice

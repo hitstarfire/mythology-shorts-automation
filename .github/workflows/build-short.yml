@@ -1,23 +1,50 @@
 name: Build Mythology Short
 
 on:
+  schedule:
+    - cron: "30 1 * * *"   # 07:00 IST
+    - cron: "30 8 * * *"   # 14:00 IST
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  prepare:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare output folders
-        run: |
-          mkdir -p output
-          echo "Mythology Shorts workflow is ready." > output/status.txt
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Save build status
+      - name: Install FFmpeg and Hindi font
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core
+          fc-cache -f
+          fc-match "Noto Sans Devanagari"
+
+      - name: Install Python packages
+        run: pip install -r requirements.txt
+
+      - name: Build Short
+        run: python build_short.py
+
+      - name: Verify MP4
+        run: |
+          ls -la output
+          test -s output/mythology-short.mp4
+          ffprobe -v error -show_entries format=duration:stream=width,height -of default=nw=1 output/mythology-short.mp4
+
+      - name: Upload for review
         uses: actions/upload-artifact@v4
         with:
-          name: mythology-short-build
+          name: hindi-mythology-short-review
           path: output/
-          
+          if-no-files-found: error
+          retention-days: 14
